@@ -10,7 +10,12 @@
  * Скрипт создаст bucket "uploads" и применит миграции.
  */
 
-require("dotenv").config({ path: require("path").join(__dirname, "..", "server", ".env") });
+const path = require("path");
+const serverDir = path.join(__dirname, "..", "server");
+const nodeModules = path.join(serverDir, "node_modules");
+require("module").globalPaths.push(nodeModules);
+
+require("dotenv").config({ path: path.join(serverDir, ".env") });
 const { createClient } = require("@supabase/supabase-js");
 const { execSync } = require("child_process");
 
