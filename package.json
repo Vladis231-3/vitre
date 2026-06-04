@@ -1,0 +1,17 @@
+{
+  "name": "vitre",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "db:migrate": "cd server && npx knex migrate:latest",
+    "db:seed": "cd server && npx knex seed:run",
+    "db:setup": "npm run db:migrate && npm run db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
