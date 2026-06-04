@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const db = require("../db");
+const supabase = require("../db");
 
 const router = Router();
 
@@ -12,7 +12,13 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Email и пароль обязательны" });
     }
 
-    const user = await db("users").where({ email }).first();
+    const { data: user, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (error) throw error;
     if (!user) {
       return res.status(401).json({ error: "Неверный email или пароль" });
     }
@@ -43,9 +49,14 @@ router.get("/me", async (req, res) => {
   try {
     const token = header.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await db("users").where({ id: decoded.id }).first();
+    const { data: user, error } = await supabase
+      .from("users")
+      .select("id, email")
+      .eq("id", decoded.id)
+      .maybeSingle();
+    if (error) throw error;
     if (!user) return res.status(401).json({ error: "Пользователь не найден" });
-    res.json({ id: user.id, email: user.email });
+    res.json(user);
   } catch {
     res.status(401).json({ error: "Неверный токен" });
   }

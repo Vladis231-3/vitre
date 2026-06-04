@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const db = require("../db");
+const supabase = require("../db");
 const auth = require("../middleware/auth");
 
 const router = Router();
@@ -10,8 +10,13 @@ router.post("/", async (req, res) => {
     if (!name || !phone) {
       return res.status(400).json({ error: "Имя и телефон обязательны" });
     }
-    const [id] = await db("submissions").insert({ name, phone, email, message }).returning("id");
-    res.status(201).json({ id: id.id, message: "Заявка отправлена" });
+    const { data, error } = await supabase
+      .from("submissions")
+      .insert({ name, phone, email, message })
+      .select("id")
+      .single();
+    if (error) throw error;
+    res.status(201).json({ id: data.id, message: "Заявка отправлена" });
   } catch (err) {
     console.error("Create submission error:", err);
     res.status(500).json({ error: "Ошибка сервера" });
@@ -21,17 +26,14 @@ router.post("/", async (req, res) => {
 router.get("/", auth, async (req, res) => {
   try {
     const { status, search } = req.query;
-    let query = db("submissions").orderBy("created_at", "desc");
-    if (status) query = query.where({ status });
+    let query = supabase.from("submissions").select("*").order("created_at", { ascending: false });
+    if (status) query = query.eq("status", status);
     if (search) {
-      query = query.where(function () {
-        this.where("name", "ilike", `%${search}%`)
-          .orWhere("phone", "ilike", `%${search}%`)
-          .orWhere("email", "ilike", `%${search}%`);
-      });
+      query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%`);
     }
-    const items = await query;
-    res.json(items);
+    const { data, error } = await query;
+    if (error) throw error;
+    res.json(data);
   } catch (err) {
     console.error("Get submissions error:", err);
     res.status(500).json({ error: "Ошибка сервера" });
@@ -40,9 +42,14 @@ router.get("/", auth, async (req, res) => {
 
 router.get("/:id", auth, async (req, res) => {
   try {
-    const item = await db("submissions").where({ id: req.params.id }).first();
-    if (!item) return res.status(404).json({ error: "Не найдено" });
-    res.json(item);
+    const { data, error } = await supabase
+      .from("submissions")
+      .select("*")
+      .eq("id", req.params.id)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return res.status(404).json({ error: "Не найдено" });
+    res.json(data);
   } catch (err) {
     res.status(500).json({ error: "Ошибка сервера" });
   }
@@ -54,7 +61,11 @@ router.put("/:id", auth, async (req, res) => {
     if (!["new", "read", "archived"].includes(status)) {
       return res.status(400).json({ error: "Неверный статус" });
     }
-    await db("submissions").where({ id: req.params.id }).update({ status });
+    const { error } = await supabase
+      .from("submissions")
+      .update({ status })
+      .eq("id", req.params.id);
+    if (error) throw error;
     res.json({ message: "Обновлено" });
   } catch (err) {
     res.status(500).json({ error: "Ошибка сервера" });
@@ -63,7 +74,11 @@ router.put("/:id", auth, async (req, res) => {
 
 router.delete("/:id", auth, async (req, res) => {
   try {
-    await db("submissions").where({ id: req.params.id }).del();
+    const { error } = await supabase
+      .from("submissions")
+      .delete()
+      .eq("id", req.params.id);
+    if (error) throw error;
     res.json({ message: "Удалено" });
   } catch (err) {
     res.status(500).json({ error: "Ошибка сервера" });

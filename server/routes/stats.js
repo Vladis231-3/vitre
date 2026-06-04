@@ -1,29 +1,55 @@
 const { Router } = require("express");
-const db = require("../db");
+const supabase = require("../db");
 const auth = require("../middleware/auth");
 
 const router = Router();
 
 router.get("/", auth, async (req, res) => {
   try {
-    const totalSubmissions = (await db("submissions").count("* as cnt").first()).cnt;
-    const newSubmissions = (await db("submissions").where({ status: "new" }).count("* as cnt").first()).cnt;
-    const todaySubmissions = (
-      await db("submissions")
-        .whereRaw("created_at >= CURRENT_DATE")
-        .count("* as cnt")
-        .first()
-    ).cnt;
-    const totalServices = (await db("services").count("* as cnt").first()).cnt;
-    const totalReviews = (await db("reviews").count("* as cnt").first()).cnt;
-    const totalWorks = (await db("works").count("* as cnt").first()).cnt;
+    const { count: totalSubmissions } = await supabase
+      .from("submissions")
+      .select("*", { count: "exact", head: true });
 
-    const submissionsByDay = await db("submissions")
-      .select(db.raw("DATE(created_at) as date"))
-      .count("* as count")
-      .groupBy("date")
-      .orderBy("date", "asc")
-      .limit(30);
+    const { count: newSubmissions } = await supabase
+      .from("submissions")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "new");
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const { count: todaySubmissions } = await supabase
+      .from("submissions")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", today.toISOString());
+
+    const { count: totalServices } = await supabase
+      .from("services")
+      .select("*", { count: "exact", head: true });
+
+    const { count: totalReviews } = await supabase
+      .from("reviews")
+      .select("*", { count: "exact", head: true });
+
+    const { count: totalWorks } = await supabase
+      .from("works")
+      .select("*", { count: "exact", head: true });
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const { data: submissionsData } = await supabase
+      .from("submissions")
+      .select("created_at")
+      .gte("created_at", thirtyDaysAgo.toISOString())
+      .order("created_at", { ascending: true });
+
+    const submissionsByDayMap = {};
+    submissionsData.forEach((s) => {
+      const date = new Date(s.created_at).toISOString().split("T")[0];
+      submissionsByDayMap[date] = (submissionsByDayMap[date] || 0) + 1;
+    });
+    const submissionsByDay = Object.entries(submissionsByDayMap)
+      .map(([date, count]) => ({ date, count }))
+      .sort((a, b) => a.date.localeCompare(b.date));
 
     res.json({
       totalSubmissions,

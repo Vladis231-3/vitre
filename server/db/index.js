@@ -1,7 +1,13 @@
 require("dotenv").config({ path: require("path").join(__dirname, "..", ".env") });
-const knex = require("knex");
-const config = require("./knexfile");
+const { createClient } = require("@supabase/supabase-js");
 
-const db = knex(config.development);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
 
-module.exports = db;
+if (!supabaseUrl || !supabaseKey) {
+  console.warn("Supabase credentials not configured");
+}
+
+const supabase = createClient(supabaseUrl || "", supabaseKey || "");
+
+module.exports = supabase;
