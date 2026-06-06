@@ -1,36 +1,33 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./components/HomePage";
-import Login from "./admin/Login";
-import AdminLayout from "./admin/AdminLayout";
 import ProtectedRoute from "./admin/ProtectedRoute";
-import Dashboard from "./admin/Dashboard";
-import Submissions from "./admin/Submissions";
-import ServicesAdmin from "./admin/ServicesAdmin";
-import WorksAdmin from "./admin/WorksAdmin";
-import ReviewsAdmin from "./admin/ReviewsAdmin";
-import CitiesAdmin from "./admin/CitiesAdmin";
-import SettingsAdmin from "./admin/SettingsAdmin";
+import AdminLayout from "./admin/AdminLayout";
+
+const Login = lazy(() => import("./admin/Login"));
+const Dashboard = lazy(() => import("./admin/Dashboard"));
+const Submissions = lazy(() => import("./admin/Submissions"));
+const ServicesAdmin = lazy(() => import("./admin/ServicesAdmin"));
+const WorksAdmin = lazy(() => import("./admin/WorksAdmin"));
+const ReviewsAdmin = lazy(() => import("./admin/ReviewsAdmin"));
+const CitiesAdmin = lazy(() => import("./admin/CitiesAdmin"));
+const SettingsAdmin = lazy(() => import("./admin/SettingsAdmin"));
+
+function L({c:C,...p}){return <Suspense fallback={<div className="la"/>}><C {...p}/></Suspense>}
 
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/admin/login" element={<Login />} />
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute>
-            <AdminLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Dashboard />} />
-        <Route path="submissions" element={<Submissions />} />
-        <Route path="services" element={<ServicesAdmin />} />
-        <Route path="works" element={<WorksAdmin />} />
-        <Route path="reviews" element={<ReviewsAdmin />} />
-        <Route path="cities" element={<CitiesAdmin />} />
-        <Route path="settings" element={<SettingsAdmin />} />
+      <Route path="/admin/login" element={<L c={Login} />} />
+      <Route path="/admin" element={<ProtectedRoute><AdminLayout/></ProtectedRoute>}>
+        <Route index element={<L c={Dashboard} />} />
+        <Route path="submissions" element={<L c={Submissions} />} />
+        <Route path="services" element={<L c={ServicesAdmin} />} />
+        <Route path="works" element={<L c={WorksAdmin} />} />
+        <Route path="reviews" element={<L c={ReviewsAdmin} />} />
+        <Route path="cities" element={<L c={CitiesAdmin} />} />
+        <Route path="settings" element={<L c={SettingsAdmin} />} />
       </Route>
     </Routes>
   );
