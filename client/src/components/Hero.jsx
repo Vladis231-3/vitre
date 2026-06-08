@@ -66,7 +66,7 @@ export default function Hero() {
       <div className="h-orb ho3"></div>
       <div className="hero-l">
         <div className="h-pill"><div className="h-pill-dot"></div>Профессиональная полировка стекла</div>
-        <h1 className="h-title"><span className="line">Стекло</span><span className="line"><em>как новое</em></span></h1>
+        <h1 className="h-title"><span className="line">Полировка</span><span className="line"><em>стекла</em></span></h1>
         <p className="h-sub">Удаляем царапины со стеклопакетов, панорамных окон и витрин без оптических искажений. Повреждения от ремонта — наша специализация.</p>
         <div className="h-actions">
           <a href="#cta" className="btn-p">Отправить заявку →</a>

@@ -39,7 +39,7 @@ const cities = [
   },
 ];
 
-function Slideshow({ photos }) {
+function Slideshow({ photos, cityName }) {
   const [cur, setCur] = useState(0);
 
   useEffect(() => {
@@ -50,9 +50,17 @@ function Slideshow({ photos }) {
   return (
     <div className="ci-slideshow">
       <div className="csl-track" style={{ transform: `translateX(-${cur * 100}%)` }}>
-        {photos.map((p, i) => (
-          <div key={i} className="csl-slide" style={{ backgroundImage: `url(/images/${p})` }}></div>
-        ))}
+        {photos.map((p, i) => {
+          const base = p.replace(/\.\w+$/, "");
+          return (
+            <div key={i} className="csl-slide">
+              <picture>
+                <source srcSet={`/images/${base}.avif`} type="image/avif" />
+                <img src={`/images/${p}`} alt={`Полировка стекла в ${cityName} — работа ${i + 1}`} loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              </picture>
+            </div>
+          );
+        })}
       </div>
       <div className="csl-dots">
         {photos.map((_, i) => (
@@ -96,7 +104,7 @@ export default function Cities() {
                 <a href="#cta" className="btn-p teal">Получить оценку</a>
               </div>
             </div>
-            <Slideshow photos={c.photos} />
+            <Slideshow photos={c.photos} cityName={c.name} />
           </div>
         ))}
       </div>

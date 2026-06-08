@@ -7,9 +7,9 @@ export default function Footer() {
         <a href="#cities">Города</a>
         <a href="#results">Работы</a>
         <a href="#cta">Заявка</a>
-        <a href="https://t.me/vitre_ru" target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>✈️ Telegram</a>
+        <a href="https://t.me/vitre_ru" target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>Telegram</a>
       </div>
-      <div className="f-copy">© 2024 VITRE</div>
+      <div className="f-copy">© 2025 VITRE — Полировка стекла в Москве и по России</div>
     </footer>
   );
 }
