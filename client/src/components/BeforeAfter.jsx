@@ -12,13 +12,24 @@ const baData = [
 ];
 
 function BACard({ d }) {
+  const doBase = d.do.replace(/\.\w+$/, "");
+  const posleBase = d.posle.replace(/\.\w+$/, "");
   return (
     <div className="bacard">
-      <div className="ba-before-layer" style={{ backgroundImage: `url(/images/${d.do})`, backgroundSize: "cover", backgroundPosition: "center" }}>
+      <div className="ba-before-layer">
+        <picture>
+          <source srcSet={`/images/${doBase}.avif`} type="image/avif" />
+          <img src={`/images/${d.do}`} alt={d.title} loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        </picture>
         <div className="ba-scr bas1"></div>
         <div className="ba-scr bas2"></div>
       </div>
-      <div className="ba-after-layer" style={{ backgroundImage: `url(/images/${d.posle})`, backgroundSize: "cover", backgroundPosition: "center" }}></div>
+      <div className="ba-after-layer">
+        <picture>
+          <source srcSet={`/images/${posleBase}.avif`} type="image/avif" />
+          <img src={`/images/${d.posle}`} alt={d.title + " после"} loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        </picture>
+      </div>
       <div className="ba-line"><div className="ba-line-ico">⇄</div></div>
       <div className="ba-lbls2"><span className="ba-lbl2 bl-b">До</span><span className="ba-lbl2 bl-a">После</span></div>
       <div className="ba-idle-hint"><div className="ba-idle-pill">← двигай мышью →</div></div>

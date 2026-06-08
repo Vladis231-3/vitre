@@ -19,21 +19,29 @@ const works = [
 ];
 
 function WCard({ w }) {
+  const imgBase = w.img ? w.img.replace(/\.\w+$/, "") : null;
   return (
     <div className={`wcard ${w.cls}`}>
       {w.video ? (
         <>
-          <video className="wcard-video" autoPlay muted loop playsInline>
+          <video className="wcard-video" autoPlay muted loop playsInline preload="none">
             <source src={`/videos/${w.video}`} type="video/mp4" />
           </video>
           <div className="wcard-shine"></div>
           <div className="wcard-frame"></div>
         </>
       ) : (
-        <div
-          className="wcard-bg"
-          style={{ backgroundImage: `url(/images/${w.img})`, backgroundSize: "cover", backgroundPosition: "center" }}
-        >
+        <div className="wcard-bg">
+          <picture>
+            <source srcSet={`/images/${imgBase}.avif`} type="image/avif" />
+            <img
+              src={`/images/${w.img}`}
+              alt={w.title}
+              loading="lazy"
+              decoding="async"
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            />
+          </picture>
           <div className="wcard-shine"></div>
           <div className="wcard-frame"></div>
         </div>

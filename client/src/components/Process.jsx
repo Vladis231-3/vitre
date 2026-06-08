@@ -1,4 +1,19 @@
+import { useEffect, useRef } from "react";
+
 export default function Process() {
+  const vidRef = useRef(null);
+  const fbRef = useRef(null);
+
+  useEffect(() => {
+    const vid = vidRef.current;
+    const fb = fbRef.current;
+    if (!vid || !fb) return;
+    const hide = () => fb.classList.remove("show");
+    vid.addEventListener("canplay", hide);
+    vid.addEventListener("playing", hide);
+    setTimeout(() => { if (vid.readyState >= 2) hide(); }, 500);
+  }, []);
+
   return (
     <section id="process">
       <div className="s-lbl rv">Как мы работаем</div>
@@ -39,10 +54,10 @@ export default function Process() {
           </div>
         </div>
         <div className="proc-vis rv-r d3">
-          <video className="pv-video" autoPlay muted loop playsInline>
+          <video ref={vidRef} className="pv-video" autoPlay muted loop playsInline preload="none">
             <source src="/videos/process-video.mp4" type="video/mp4" />
           </video>
-          <div className="pv-fallback show">
+          <div ref={fbRef} className="pv-fallback show">
             <div className="pv-in">
               <div className="pv-lbl">Степень полировки</div>
               <div className="pv-track"><div className="pv-fill"></div></div>

@@ -76,7 +76,7 @@ export default function Hero() {
       </div>
       <div className="hero-r">
         <div className="hero-vid-wrap">
-          <video className="hero-vid" ref={vidRef} autoPlay loop playsInline>
+          <video className="hero-vid" ref={vidRef} autoPlay loop playsInline preload="auto">
             <source src="/videos/hero-video.mp4" type="video/mp4" />
           </video>
           <div className="hero-vid-fallback">
